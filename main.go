@@ -1,50 +1,53 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"io/ioutil"
 )
 
-// Define a struct to map the response data from the API
-type PopulationData struct {
-	ID       string `json:"ID"`
-	Period   string `json:"Perioden"`
-	Population int    `json:"Bevolking"`
+// Define a struct to map the response data
+type DogImage struct {
+	Message string `json:"message"`
+	Status  string `json:"status"`
 }
 
 func main() {
-	// Define the CBS API endpoint
-	apiURL := "https://opendata.cbs.nl/ODataApi/odata/37325eng/TypedDataSet"
+	// Define the API endpoint
+	apiURL := ""
 
 	// Make the HTTP request
-	resp, err := http.Get(apiURL)
+	req, err := http.NewRequest("GET", apiURL, nil)
 	if err != nil {
 		log.Fatalf("Failed to make request: %v", err)
 	}
+
+	req.Header.Set("accept", "application/vnd.linkedin.normalized+json+2.1")
+	req.Header.Set("Referer", "https://www.linkedin.com/jobs/")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+
+	// Create an HTTP client
+	client := &http.Client{}
+
+	// Send the request
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("Error sending request: %v", err)
+	}
 	defer resp.Body.Close()
 
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("Request failed with status: %s", resp.Status)
+	}
+
 	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("Failed to read response body: %v", err)
+		log.Fatalf("Error reading response body: %v", err)
 	}
 
-	// Parse the JSON response
-	var result struct {
-		Value []PopulationData `json:"value"`
-	}
-	if err := json.Unmarshal(body, &result); err != nil {
-		log.Fatalf("Failed to parse JSON: %v", err)
-	}
-
-	// Print the first few entries as an example
-	for i, data := range result.Value {
-		fmt.Printf("Entry %d: Year: %s, Population: %d\n", i+1, data.Period, data.Population)
-		if i == 9 {
-			break // Limit output to the first 10 entries
-		}
-	}
+	// Print the response body
+	fmt.Println(string(body))
 }

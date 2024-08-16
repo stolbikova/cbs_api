@@ -1,0 +1,4 @@
+.env
+/src/easyApplyBody.js
+/node_modules
+/dist
