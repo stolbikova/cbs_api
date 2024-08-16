@@ -1,4 +1,4 @@
-export function detectLanguage(text) {
+export function detectLanguage(text: string) {
   // Some common Dutch and English words
   const dutchWords = ["de", "het", "een", "hij", "zijn"];
   const englishWords = ["the", "is", "and", "of", "to"];
@@ -8,7 +8,7 @@ export function detectLanguage(text) {
 
   const words = text.toLowerCase().split(/\s+/);
 
-  words.forEach((word) => {
+  words.forEach((word: string) => {
     if (dutchWords.includes(word)) {
       dutchCount++;
     }
@@ -26,6 +26,6 @@ export function detectLanguage(text) {
   }
 }
 
-export function containsAnyFlag(text, flags) {
+export function containsAnyFlag(text: string, flags: string[]) {
   return flags.some((flag) => text.toLowerCase().includes(flag.toLowerCase()));
 }

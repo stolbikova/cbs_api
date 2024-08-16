@@ -6,8 +6,9 @@ import {
   greenFlags,
   redFlags,
 } from "./constants.js";
+import { Response, JobsData } from "./interface.js";
 
-async function fetchJob(jobId) {
+async function fetchJob(jobId: number): Promise<JobsData | null> {
   try {
     const url = job_url(jobId);
     const res = await fetch(url, {
@@ -42,14 +43,14 @@ async function fetchJob(jobId) {
   }
 }
 
-async function fetchJobs(filtrationLevel) {
+async function fetchJobs(filtrationLevel: number) {
   try {
     const res = await fetch(listing_url, {
       headers: headers,
       body: null,
       method: "GET",
     });
-    const jsonData = await res.json();
+    const jsonData: Response = await res.json();
 
     const { included } = jsonData;
 
@@ -57,15 +58,21 @@ async function fetchJobs(filtrationLevel) {
       .filter((item) => item.entityUrn.includes("jobPosting"))
       .map((item) => item.entityUrn);
 
-    const numbers = urns.map((str) => {
+    const numbers: (number | null)[] = urns.map((str: string) => {
       const match = str.match(/\d+/);
-      return match ? match[0] : null;
+      return match ? parseInt(match[0], 10) : null;
     });
 
-    const jobs = await Promise.all(numbers.map((id) => fetchJob(id)));
+    const jobs: (JobsData | null)[] = await Promise.all(
+      (numbers.filter((n) => n !== null) as number[]).map((id: number) =>
+        fetchJob(id)
+      )
+    );
 
     // Filter out null values (non-relevant jobs)
     const relevantJobs = jobs.filter((jobData) => {
+      if (jobData === null) return false;
+
       const isAmsterdam = jobData.formattedLocation.includes("Amsterdam");
       if (
         filtrationLevel > 0 &&

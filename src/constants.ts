@@ -3,7 +3,7 @@ dotenv.config();
 
 export const COUNT = 20;
 export const listing_url = `https://www.linkedin.com/voyager/api/voyagerJobsDashJobCards\n?decorationId=com.linkedin.voyager.dash.deco.jobs.search.JobSearchCardsCollectionLite-80&count=${COUNT}&q=jobSearch\n&query=(origin:JOBS_HOME_SEARCH_CARDS,locationUnion:(geoId:102890719),selectedFilters:(distance:List(25)),spellCorrectionEnabled:true)\n`;
-export const job_url = (jobId) =>
+export const job_url = (jobId: number) =>
   `https://www.linkedin.com/voyager/api/jobs/jobPostings/${jobId}?decorationId=com.linkedin.voyager.deco.jobs.web.shared.WebLightJobPosting-23&`;
 
 const cookie = `bscookie=${process.env.BSCOOKIE};  JSESSIONID="ajax:${process.env.CSRF_TOKEN}";  li_at=${process.env.LI_AT};`;
